@@ -62,18 +62,19 @@ class _MyHomePageState extends State<MyHomePage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Scaffold(
+          appBar: AppBar(title: const Text('Tip-Tap-Type')),
           body: Row(
             children: [
               SafeArea(
                 child: NavigationRail(
-                  extended: constraints.maxWidth >= 600,
+                  extended: constraints.maxWidth >= 1000,
                   destinations: const [
                     NavigationRailDestination(
                       icon: Icon(Icons.home),
                       label: Text('Home'),
                     ),
                     NavigationRailDestination(
-                      icon: Icon(Icons.sports_gymnastics_rounded),
+                      icon: Icon(Icons.sports_esports),
                       label: Text('Play'),
                     ),
                       NavigationRailDestination(
@@ -111,14 +112,23 @@ class TitlePage extends StatelessWidget {
   const TitlePage({ super.key });
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('TIP-TAP-TYPE'),
-          SizedBox(height: 10),
-        ],
-      ),
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Text("Welcome! Let's get practicing!"),
+        SizedBox(height: 30),
+        Row(
+          children: [
+            Text(
+              '''Difficulties: 
+              Simple: lowercase and basic words
+              Standard: capital letters, punctuation and common words
+              Stupendous: capital letters, punctuation and complex words
+              '''
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

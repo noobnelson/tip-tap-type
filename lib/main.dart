@@ -25,9 +25,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {
-
-}
+class MyAppState extends ChangeNotifier {}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -59,90 +57,167 @@ class _MyHomePageState extends State<MyHomePage> {
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('Tip-Tap-Type')),
-          body: Row(
-            children: [
-              SafeArea(
-                child: NavigationRail(
-                  extended: constraints.maxWidth >= 1000,
-                  destinations: const [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.home),
-                      label: Text('Home'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.sports_esports),
-                      label: Text('Play'),
-                    ),
-                      NavigationRailDestination(
-                      icon: Icon(Icons.star_rounded),
-                      label: Text('Leaderboard'),
-                    ),
-                      NavigationRailDestination(
-                      icon: Icon(Icons.settings),
-                      label: Text('Settings'),
-                    ),
-                  ],
-                  selectedIndex: selectedIndex,
-                  onDestinationSelected: (value) {
-                    setState(() {
-                      selectedIndex = value;
-                    });
-                  },
-                ),
+    return LayoutBuilder(builder: (context, constraints) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Tip-Tap-Type')),
+        body: Row(
+          children: [
+            SafeArea(
+              child: NavigationRail(
+                extended: constraints.maxWidth >= 1000,
+                destinations: const [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.home),
+                    label: Text('Home'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.sports_esports),
+                    label: Text('Play'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.star_rounded),
+                    label: Text('Leaderboard'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.settings),
+                    label: Text('Settings'),
+                  ),
+                ],
+                selectedIndex: selectedIndex,
+                onDestinationSelected: (value) {
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
               ),
-              Expanded(
-                child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: page,
-                ),
+            ),
+            Expanded(
+              child: Container(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: page,
               ),
-            ],
-          ),
-        );
-      }
-    );
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
 class TitlePage extends StatelessWidget {
-  const TitlePage({ super.key });
+  const TitlePage({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Text("Welcome! Let's get practicing!"),
-        SizedBox(height: 30),
-        Row(
-          children: [
-            Text(
-              '''Difficulties: 
-              Simple: lowercase and basic words
-              Standard: capital letters, punctuation and common words
-              Stupendous: capital letters, punctuation and complex words
-              '''
-            ),
-          ],
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(25.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            "Welcome! Let's get practicing!",
+            style:
+                DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+          ),
+          const SizedBox(height: 30),
+          const Row(
+            children: [
+              Text('''Difficulties: 
+                Simple: lowercase and basic words
+                Standard: capital letters, punctuation and common words
+                Stupendous: capital letters, punctuation and complex words
+                '''),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
 class PlayPage extends StatelessWidget {
-  const PlayPage({ super.key });
+  const PlayPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Padding(
+      padding: const EdgeInsets.all(25.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text('SELECT DIFFICULTY'),
-          SizedBox(height: 10),
+          Text(
+            'SELECT DIFFICULTY',
+            style:
+                DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              
+              FilledButton(
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.withOpacity(0.04);
+                        }
+                        if (states.contains(MaterialState.focused) ||
+                            states.contains(MaterialState.pressed)) {
+                          return Colors.blue.withOpacity(0.12);
+                        }
+                        return null; // Defer to the widget's default.
+                      },
+                    ),
+                  ),
+                  onPressed: () {
+                    print('Simple selected');
+                  },
+                  child: const Text('Simple')),
+              FilledButton(
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.withOpacity(0.04);
+                        }
+                        if (states.contains(MaterialState.focused) ||
+                            states.contains(MaterialState.pressed)) {
+                          return Colors.blue.withOpacity(0.12);
+                        }
+                        return null; // Defer to the widget's default.
+                      },
+                    ),
+                  ),
+                  onPressed: () {
+                    print('Standard selected');
+                  },
+                  child: const Text('Standard')),
+              FilledButton(
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.withOpacity(0.04);
+                        }
+                        if (states.contains(MaterialState.focused) ||
+                            states.contains(MaterialState.pressed)) {
+                          return Colors.blue.withOpacity(0.12);
+                        }
+                        return null; // Defer to the widget's default.
+                      },
+                    ),
+                  ),
+                  onPressed: () {
+                    print('Stupendous selected');
+                  },
+                  child: const Text('Stupendous')),
+            ],
+          ),
         ],
       ),
     );
@@ -150,7 +225,7 @@ class PlayPage extends StatelessWidget {
 }
 
 class LeaderboardPage extends StatelessWidget {
-  const LeaderboardPage({ super.key });
+  const LeaderboardPage({super.key});
   @override
   Widget build(BuildContext context) {
     return const Center(
@@ -166,7 +241,7 @@ class LeaderboardPage extends StatelessWidget {
 }
 
 class OptionsPage extends StatelessWidget {
-  const OptionsPage({ super.key });
+  const OptionsPage({super.key});
   @override
   Widget build(BuildContext context) {
     return const Center(

@@ -138,87 +138,65 @@ class PlayPage extends StatelessWidget {
   const PlayPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(25.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'SELECT DIFFICULTY',
-            style:
-                DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              
-              FilledButton(
-                  style: ButtonStyle(
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered)) {
-                          return Colors.blue.withOpacity(0.04);
-                        }
-                        if (states.contains(MaterialState.focused) ||
-                            states.contains(MaterialState.pressed)) {
-                          return Colors.blue.withOpacity(0.12);
-                        }
-                        return null; // Defer to the widget's default.
-                      },
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'SELECT DIFFICULTY',
+              style:
+                  DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: Expanded(
+                      child: FilledButton(
+                        onPressed: () {
+                          print('test');
+                        },
+                        child: const Text('Simple'),
+                      ),
                     ),
                   ),
-                  onPressed: () {
-                    print('Simple selected');
-                  },
-                  child: const Text('Simple')),
-              FilledButton(
-                  style: ButtonStyle(
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered)) {
-                          return Colors.blue.withOpacity(0.04);
-                        }
-                        if (states.contains(MaterialState.focused) ||
-                            states.contains(MaterialState.pressed)) {
-                          return Colors.blue.withOpacity(0.12);
-                        }
-                        return null; // Defer to the widget's default.
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: FilledButton(
+                      onPressed: () {
+                        print('test');
                       },
+                      child: const Text('Standard'),
                     ),
                   ),
-                  onPressed: () {
-                    print('Standard selected');
-                  },
-                  child: const Text('Standard')),
-              FilledButton(
-                  style: ButtonStyle(
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered)) {
-                          return Colors.blue.withOpacity(0.04);
-                        }
-                        if (states.contains(MaterialState.focused) ||
-                            states.contains(MaterialState.pressed)) {
-                          return Colors.blue.withOpacity(0.12);
-                        }
-                        return null; // Defer to the widget's default.
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: FilledButton(
+                      onPressed: () {
+                        print('test3');
                       },
+                      child: const Text('Stupendous'),
                     ),
                   ),
-                  onPressed: () {
-                    print('Stupendous selected');
-                  },
-                  child: const Text('Stupendous')),
-            ],
-          ),
-        ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

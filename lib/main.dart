@@ -25,7 +25,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {}
+class MyAppState extends ChangeNotifier {
+  var selectedPlayIndex = 0;
+
+  void updatePlayIndex(int index) {
+    selectedPlayIndex = index;
+    notifyListeners();
+  }
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -36,9 +43,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
-
+  
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
     Widget page;
     switch (selectedIndex) {
       case 0:
@@ -59,7 +67,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Tip-Tap-Type')),
         body: Row(
           children: [
             SafeArea(
@@ -87,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onDestinationSelected: (value) {
                   setState(() {
                     selectedIndex = value;
+                    appState.updatePlayIndex(0);
                   });
                 },
               ),
@@ -134,10 +142,45 @@ class TitlePage extends StatelessWidget {
   }
 }
 
-class PlayPage extends StatelessWidget {
+class PlayPage extends StatefulWidget {
   const PlayPage({super.key});
+
+  @override
+  State<PlayPage> createState() => _PlayPageState();
+}
+
+class _PlayPageState extends State<PlayPage> {
   @override
   Widget build(BuildContext context) {
+    Widget page = const DifficultySelectPage();
+    var appState = context.watch<MyAppState>();
+    switch (appState.selectedPlayIndex) {
+      case 0:
+        page = const DifficultySelectPage();
+        break;
+      case 1:
+        page = const TypingPage();
+        break;
+
+      case 2:
+        break;
+
+      default:
+        throw UnimplementedError('no widget');
+    }
+
+    return Container(
+      child: page,
+    );
+  }
+}
+
+class DifficultySelectPage extends StatelessWidget {
+  const DifficultySelectPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -150,48 +193,30 @@ class PlayPage extends StatelessWidget {
                   DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
             ),
             const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: FilledButton(
-                      onPressed: () {
-                        print('test1');
-                      },
-                      child: const Text('Simple'),
-                    ),
-                  ),
+            Expanded(
+              child: SizedBox(
+                height: 300,
+                width: 300,
+                child: FilledButton(
+                  onPressed: () {
+                    appState.updatePlayIndex(1);
+                  },
+                  child: const Text('Simple'),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: FilledButton(
-                      onPressed: () {
-                        print('test2');
-                      },
-                      child: const Text('Standard'),
-                    ),
-                  ),
+              ),
+            ),
+            const SizedBox(height: 50),
+            Expanded(
+              child: SizedBox(
+                height: 300,
+                width: 300,
+                child: FilledButton(
+                  onPressed: () {
+                    print('test2');
+                  },
+                  child: const Text('Standard'),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: FilledButton(
-                      onPressed: () {
-                        print('test3');
-                      },
-                      child: const Text('Stupendous'),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),
@@ -200,18 +225,18 @@ class PlayPage extends StatelessWidget {
   }
 }
 
-class TypingPage extends StatelessWidget{
+class TypingPage extends StatelessWidget {
   const TypingPage({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(10),
+        child: Text('simple'),
       ),
     );
   }
-
 }
 
 class LeaderboardPage extends StatelessWidget {

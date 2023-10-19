@@ -157,13 +157,11 @@ class PlayPage extends StatelessWidget {
                   child: SizedBox(
                     height: 100,
                     width: 100,
-                    child: Expanded(
-                      child: FilledButton(
-                        onPressed: () {
-                          print('test');
-                        },
-                        child: const Text('Simple'),
-                      ),
+                    child: FilledButton(
+                      onPressed: () {
+                        print('test1');
+                      },
+                      child: const Text('Simple'),
                     ),
                   ),
                 ),
@@ -174,7 +172,7 @@ class PlayPage extends StatelessWidget {
                     width: 100,
                     child: FilledButton(
                       onPressed: () {
-                        print('test');
+                        print('test2');
                       },
                       child: const Text('Standard'),
                     ),
@@ -200,6 +198,20 @@ class PlayPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class TypingPage extends StatelessWidget{
+  const TypingPage({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(10),
+      ),
+    );
+  }
+
 }
 
 class LeaderboardPage extends StatelessWidget {

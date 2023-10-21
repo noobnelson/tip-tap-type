@@ -92,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   NavigationRailDestination(
                     icon: Icon(Icons.star_rounded),
-                    label: Text('Leaderboard'),
+                    label: Text('Highscores'),
                   ),
                   NavigationRailDestination(
                     icon: Icon(Icons.settings),
@@ -128,7 +128,7 @@ class TitlePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(25.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "Welcome! Let's get practicing!",
@@ -136,16 +136,49 @@ class TitlePage extends StatelessWidget {
                 DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
           ),
           const SizedBox(height: 30),
-          const Row(
-            children: [
-              Text(
-                style: TextStyle(fontSize: 20),
-                '''Modes: 
-                Typing Practice: Just keep typing, just keep typing~
-                100 Word Dash: Type 100 words as fast as you can!
-                Minute to Win It: Can you type 100 words in 1 minute?
-                '''),
-            ],
+          RichText(
+            text: const TextSpan(
+              style: TextStyle(color: Colors.black),
+              children: <TextSpan>[
+                TextSpan(
+                  text: 'MODES',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Text(
+            'Typing Practice',
+            style: TextStyle(fontSize: 30),
+          ),
+          const Text(
+            'Just keep typing, just keep typing~',
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Text(
+            '100 Word Dash',
+            style: TextStyle(fontSize: 30),
+          ),
+          const Text(
+            'Type 100 words as fast as you can!',
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Text(
+            'Minute to Win It',
+            style: TextStyle(fontSize: 30),
+          ),
+          const Text(
+            'Put your skills to the test! Can you type 100 words in 1 minute?',
+          ),
+          const SizedBox(
+            height: 10,
           ),
         ],
       ),
@@ -202,10 +235,9 @@ class DifficultySelectPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'SELECT MODE',
-              style:
-                  DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -218,7 +250,11 @@ class DifficultySelectPage extends StatelessWidget {
                     keyboardState.addWords(15);
                     appState.updatePlayIndex(1);
                   },
-                  child: const Text('Typing Practice'),
+                  child: const Text(
+                    'Typing Practice',
+                    style: TextStyle(fontSize: 30),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
@@ -233,7 +269,11 @@ class DifficultySelectPage extends StatelessWidget {
                     keyboardState.addWords(100);
                     appState.updatePlayIndex(2);
                   },
-                  child: const Text('Minute to Win it'),
+                  child: const Text(
+                    'Minute to Win it',
+                    style: TextStyle(fontSize: 30),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
@@ -248,7 +288,11 @@ class DifficultySelectPage extends StatelessWidget {
                     keyboardState.addWords(100);
                     appState.updatePlayIndex(3);
                   },
-                  child: const Text('Hundred Word Dash'),
+                  child: const Text(
+                    'Hundred Word Dash',
+                    style: TextStyle(fontSize: 30),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
@@ -259,161 +303,6 @@ class DifficultySelectPage extends StatelessWidget {
   }
 }
 
-// class KeyboardState extends ChangeNotifier {
-//   KeyboardState() {
-//     loadWords().then((value) {
-//       wordBank = value.split("\r\n"); // \n new line, \r\n carriage return
-//       //addWords(100);
-//     });
-//   }
-
-//   var wordWidgets = <Widget>[];
-//   List currentWords = <String>[];
-//   List wordBank = <String>[];
-//   List charWidgets = <List>[<TextSpan>[]];
-
-//   int wordCount = 0;
-//   int charInWordCount = 0;
-
-//   Color correctColor = Colors.green;
-//   Color incorrectColor = Colors.red;
-//   Color defaultColor = Colors.black;
-
-//   Future<String> loadWords() async {
-//     final String response = await rootBundle.loadString('assets/words.txt');
-//     return response;
-//   }
-
-//   void addWords(int numberOfWords) {
-//     wordWidgets.clear();
-//     charWidgets.clear();
-//     currentWords.clear();
-//     wordCount = 0;
-//     charInWordCount = 0;
-
-//     int startPoint = currentWords.length;
-//     int wordBankSize = wordBank.length;
-
-//     for (int i = 0; i < numberOfWords; i++) {
-//       int randomWordPosition = Random().nextInt(wordBankSize);
-//       currentWords.add(wordBank[randomWordPosition]);
-//     }
-
-//     for (var i = startPoint; i < currentWords.length; i++) {
-//       var textList = <TextSpan>[];
-//       for (var j = 0; j < currentWords[i].length; j++) {
-//         textList.add(TextSpan(
-//             text: currentWords[i][j],
-//             style: const TextStyle(color: Colors.black)));
-//       }
-//       textList.add(const TextSpan(
-//         text: ' ',
-//       ));
-//       charWidgets.add(textList);
-//       wordWidgets.add(RichText(
-//         text: TextSpan(
-//           children: charWidgets[i],
-//         ),
-//       ));
-//     }
-//   }
-
-//   void replaceChar(Color color, String key) {
-//     TextSpan newText = TextSpan(text: key, style: TextStyle(color: color));
-//     //print(charWidgets[wordCount][charInWordCount]);
-//     charWidgets[wordCount][charInWordCount] = newText;
-
-//     var newWord = RichText(
-//       text: TextSpan(
-//         children: charWidgets[wordCount],
-//       ),
-//     );
-
-//     //notifyListeners();
-
-//     // wordWidgets.removeAt(wordCount);
-//     // notifyListeners();
-//     // wordWidgets.insert(wordCount, newWord);
-
-//     wordWidgets[wordCount] = newWord;
-//     //notifyListeners();
-//     // print(wordWidgets);
-//     //print(charWidgets[wordCount][charInWordCount]);
-//     //charWidgets.insert(charInWordCount, newText);
-//     //print(start == end);
-
-//     notifyListeners();
-//   }
-
-//   String currentCharacter() {
-//     String result = '';
-//     if (currentWords[wordCount].length > charInWordCount) {
-//       result = currentWords[wordCount][charInWordCount];
-//     }
-//     return result;
-//   }
-
-//   void addChild(String char, Color color, int pos) {
-//     charWidgets[wordCount].insert(
-//         charInWordCount, TextSpan(text: char, style: TextStyle(color: color)));
-//     notifyListeners();
-//   }
-
-//   void moveToNextWord() {
-//     if (charInWordCount < currentWords[wordCount].length) {
-//       int missingChars = currentWords[wordCount].length - charInWordCount;
-//       for (int i = 0; i < missingChars; i++) {
-//         replaceChar(
-//           incorrectColor,
-//           currentWords[wordCount][charInWordCount + i],
-//         );
-//       }
-//     }
-//     charInWordCount = 0;
-//     wordCount++;
-//     print("space");
-//   }
-
-//   void correctCharTyped(String keyInput) {
-//     replaceChar(correctColor, keyInput);
-//     charInWordCount++;
-//     //print("correct");
-//   }
-
-//   void incorrectCharTyped() {
-//     replaceChar(
-//       incorrectColor,
-//       currentWords[wordCount][charInWordCount],
-//     );
-//     charInWordCount++;
-//     print('wrong');
-//   }
-
-//   void addIncorrectChar(String char) {
-//     addChild(char, incorrectColor, charInWordCount);
-//     charInWordCount++;
-//     print("overflow");
-//   }
-
-//   void deleteChar() {
-//     if (charInWordCount > 0) {
-//       if (charInWordCount <= currentWords[wordCount].length) {
-//         charInWordCount--;
-//         print("delete in limit");
-//         replaceChar(
-//           defaultColor,
-//           currentWords[wordCount][charInWordCount],
-//         );
-//       } else {
-//         var w = wordWidgets.removeAt(charInWordCount);
-//         print(w);
-//         charInWordCount--;
-//         print("delete over limit");
-//         notifyListeners();
-//       }
-//     }
-//   }
-// }
 class KeyboardState extends ChangeNotifier {
   KeyboardState() {
     loadWords().then((value) {
@@ -486,6 +375,10 @@ class KeyboardState extends ChangeNotifier {
     return result;
   }
 
+  bool excessTyping() {
+    return currentWords[wordCount].length <= charInWordCount;
+  }
+
   void addChild(String char, Color color, int pos) {
     wordWidgets.insert(
         pos,
@@ -501,11 +394,11 @@ class KeyboardState extends ChangeNotifier {
       int missingChars = currentWords[wordCount].length - charInWordCount;
       for (int i = 0; i < missingChars; i++) {
         replaceChar(
-            incorrectColor,
-            currentWords[wordCount][charInWordCount + i],
-            charInWidgetsCount + i);
+          incorrectColor, 
+          currentWords[wordCount][charInWordCount + i], 
+          charInWidgetsCount + i
+        );
       }
-
       charInWidgetsCount += missingChars + 1;
       charInWordCount = 0;
       wordCount++;
@@ -526,8 +419,11 @@ class KeyboardState extends ChangeNotifier {
   }
 
   void incorrectCharTyped() {
-    replaceChar(incorrectColor, currentWords[wordCount][charInWordCount],
-        charInWidgetsCount);
+    replaceChar(
+      incorrectColor, 
+      currentWords[wordCount][charInWordCount], 
+      charInWidgetsCount
+    );
     charInWordCount++;
     charInWidgetsCount++;
     // print('wrong');
@@ -546,8 +442,11 @@ class KeyboardState extends ChangeNotifier {
         charInWidgetsCount--;
         charInWordCount--;
         // print("delete in limit");
-        replaceChar(defaultColor, currentWords[wordCount][charInWordCount],
-            charInWidgetsCount);
+        replaceChar(
+          defaultColor, 
+          currentWords[wordCount][charInWordCount],
+          charInWidgetsCount
+        );
       } else {
         charInWidgetsCount--;
         Widget w = wordWidgets.removeAt(charInWidgetsCount);
@@ -566,8 +465,7 @@ class TypingPracticePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
-
-    Row textWrap = Row(children: keyboardState.wordWidgets);
+    Row wordsRow = Row(children: keyboardState.wordWidgets);
 
     return RawKeyboardListener(
       onKey: (event) {
@@ -578,9 +476,7 @@ class TypingPracticePage extends StatelessWidget {
             keyboardState.correctCharTyped(event.character.toString());
           } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
             keyboardState.deleteChar();
-          } else if (keyboardState
-                  .currentWords[keyboardState.wordCount].length <=
-              keyboardState.charInWordCount) {
+          } else if (keyboardState.excessTyping()) {
             keyboardState.addIncorrectChar(event.character.toString());
           } else if (event.character != keyboardState.currentCharacter()) {
             keyboardState.incorrectCharTyped();
@@ -593,7 +489,7 @@ class TypingPracticePage extends StatelessWidget {
         width: 500,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: textWrap,
+          child: wordsRow,
         ),
       ),
     );
@@ -607,7 +503,7 @@ class MinuteToWinPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
 
-    Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
+    Wrap wordsRow = Wrap(children: keyboardState.wordWidgets);
 
     return RawKeyboardListener(
       onKey: (event) {
@@ -618,9 +514,7 @@ class MinuteToWinPage extends StatelessWidget {
             keyboardState.correctCharTyped(event.character.toString());
           } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
             keyboardState.deleteChar();
-          } else if (keyboardState
-                  .currentWords[keyboardState.wordCount].length <=
-              keyboardState.charInWordCount) {
+          } else if (keyboardState.excessTyping()) {
             keyboardState.addIncorrectChar(event.character.toString());
           } else if (event.character != keyboardState.currentCharacter()) {
             keyboardState.incorrectCharTyped();
@@ -633,7 +527,7 @@ class MinuteToWinPage extends StatelessWidget {
         width: 500,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: textWrap,
+          child: wordsRow,
         ),
       ),
     );
@@ -647,7 +541,7 @@ class HundredWordDashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
 
-    Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
+    Wrap wordsRow = Wrap(children: keyboardState.wordWidgets);
 
     return RawKeyboardListener(
       onKey: (event) {
@@ -658,9 +552,7 @@ class HundredWordDashPage extends StatelessWidget {
             keyboardState.correctCharTyped(event.character.toString());
           } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
             keyboardState.deleteChar();
-          } else if (keyboardState
-                  .currentWords[keyboardState.wordCount].length <=
-              keyboardState.charInWordCount) {
+          } else if (keyboardState.excessTyping()) {
             keyboardState.addIncorrectChar(event.character.toString());
           } else if (event.character != keyboardState.currentCharacter()) {
             keyboardState.incorrectCharTyped();
@@ -673,7 +565,7 @@ class HundredWordDashPage extends StatelessWidget {
         width: 500,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: textWrap,
+          child: wordsRow,
         ),
       ),
     );

@@ -213,7 +213,7 @@ class DifficultySelectPage extends StatelessWidget {
                 child: FilledButton(
                   onPressed: () {
                     keyboardState.resetWords();
-                    keyboardState.addWords(15);
+                    keyboardState.addWords(30);
                     appState.updatePlayIndex(1);
                   },
                   child: const Text('Typing Practice'),
@@ -265,10 +265,10 @@ class KeyboardState extends ChangeNotifier {
     });
   }
 
-  var wordWidgets = <Widget>[];
-  List currentWords = <String>[];
-  List wordBank = <String>[];
-  List charWidgets = <List>[<TextSpan>[]];
+  List<RichText> wordWidgets = [];
+  List<String> currentWords = [];
+  List<String> wordBank = [];
+  List<List<TextSpan>> charWidgets = [[]];
 
   int wordCount = 0;
   int charInWordCount = 0;
@@ -322,25 +322,20 @@ class KeyboardState extends ChangeNotifier {
     TextSpan newText = TextSpan(text: key, style: TextStyle(color: color));
     //print(charWidgets[wordCount][charInWordCount]);
     charWidgets[wordCount][charInWordCount] = newText;
-
+    double newTextScale;
+    if (wordWidgets[wordCount].textScaleFactor == 1) {
+      newTextScale = 0.999999;
+    } else {
+      newTextScale = 1;
+    }
     var newWord = RichText(
+      textScaleFactor: newTextScale,
       text: TextSpan(
         children: charWidgets[wordCount],
       ),
     );
 
-    //notifyListeners();
-
-    // wordWidgets.removeAt(wordCount);
-    // notifyListeners();
-    // wordWidgets.insert(wordCount, newWord);
-
     wordWidgets[wordCount] = newWord;
-    //notifyListeners();
-    // print(wordWidgets);
-    //print(charWidgets[wordCount][charInWordCount]);
-    //charWidgets.insert(charInWordCount, newText);
-    //print(start == end);
 
     notifyListeners();
   }
@@ -350,6 +345,7 @@ class KeyboardState extends ChangeNotifier {
     if (currentWords[wordCount].length > charInWordCount) {
       result = currentWords[wordCount][charInWordCount];
     }
+    print(result);
     return result;
   }
 
@@ -377,7 +373,7 @@ class KeyboardState extends ChangeNotifier {
   void correctCharTyped(String keyInput) {
     replaceChar(correctColor, keyInput);
     charInWordCount++;
-    //print("correct");
+    print("correct");
   }
 
   void incorrectCharTyped() {
@@ -422,7 +418,7 @@ class TypingPracticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
 
-    Row textWrap = Row(children: keyboardState.wordWidgets);
+    Column textWrap = Column(children: keyboardState.wordWidgets);
 
     return RawKeyboardListener(
       onKey: (event) {

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -136,10 +138,12 @@ class TitlePage extends StatelessWidget {
           const SizedBox(height: 30),
           const Row(
             children: [
-              Text('''Difficulties: 
-                Simple: lowercase and basic words
-                Standard: capital letters, punctuation and common words
-                Stupendous: capital letters, punctuation and complex words
+              Text(
+                style: TextStyle(fontSize: 20),
+                '''Modes: 
+                Typing Practice: Just keep typing, just keep typing~
+                100 Word Dash: Type 100 words as fast as you can!
+                Minute to Win It: Can you type 100 words in 1 minute?
                 '''),
             ],
           ),
@@ -166,12 +170,14 @@ class _PlayPageState extends State<PlayPage> {
         page = const DifficultySelectPage();
         break;
       case 1:
-        page = const TypingSimplePage();
+        page = const TypingPracticePage();
         break;
-
       case 2:
+        page = const MinuteToWinPage();
         break;
-
+      case 3:
+        page = const HundredWordDashPage();
+        break;
       default:
         throw UnimplementedError('no widget');
     }
@@ -197,7 +203,7 @@ class DifficultySelectPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              'SELECT DIFFICULTY',
+              'SELECT MODE',
               style:
                   DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
             ),
@@ -208,10 +214,11 @@ class DifficultySelectPage extends StatelessWidget {
                 width: 300,
                 child: FilledButton(
                   onPressed: () {
-                    keyboardState.addWords(100);
+                    keyboardState.resetWords();
+                    keyboardState.addWords(15);
                     appState.updatePlayIndex(1);
                   },
-                  child: const Text('Simple'),
+                  child: const Text('Typing Practice'),
                 ),
               ),
             ),
@@ -222,9 +229,26 @@ class DifficultySelectPage extends StatelessWidget {
                 width: 300,
                 child: FilledButton(
                   onPressed: () {
-                    print('test2');
+                    keyboardState.resetWords();
+                    keyboardState.addWords(100);
+                    appState.updatePlayIndex(2);
                   },
-                  child: const Text('Standard'),
+                  child: const Text('Minute to Win it'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 50),
+            Expanded(
+              child: SizedBox(
+                height: 300,
+                width: 300,
+                child: FilledButton(
+                  onPressed: () {
+                    keyboardState.resetWords();
+                    keyboardState.addWords(100);
+                    appState.updatePlayIndex(3);
+                  },
+                  child: const Text('Hundred Word Dash'),
                 ),
               ),
             ),
@@ -235,18 +259,171 @@ class DifficultySelectPage extends StatelessWidget {
   }
 }
 
+// class KeyboardState extends ChangeNotifier {
+//   KeyboardState() {
+//     loadWords().then((value) {
+//       wordBank = value.split("\r\n"); // \n new line, \r\n carriage return
+//       //addWords(100);
+//     });
+//   }
+
+//   var wordWidgets = <Widget>[];
+//   List currentWords = <String>[];
+//   List wordBank = <String>[];
+//   List charWidgets = <List>[<TextSpan>[]];
+
+//   int wordCount = 0;
+//   int charInWordCount = 0;
+
+//   Color correctColor = Colors.green;
+//   Color incorrectColor = Colors.red;
+//   Color defaultColor = Colors.black;
+
+//   Future<String> loadWords() async {
+//     final String response = await rootBundle.loadString('assets/words.txt');
+//     return response;
+//   }
+
+//   void addWords(int numberOfWords) {
+//     wordWidgets.clear();
+//     charWidgets.clear();
+//     currentWords.clear();
+//     wordCount = 0;
+//     charInWordCount = 0;
+
+//     int startPoint = currentWords.length;
+//     int wordBankSize = wordBank.length;
+
+//     for (int i = 0; i < numberOfWords; i++) {
+//       int randomWordPosition = Random().nextInt(wordBankSize);
+//       currentWords.add(wordBank[randomWordPosition]);
+//     }
+
+//     for (var i = startPoint; i < currentWords.length; i++) {
+//       var textList = <TextSpan>[];
+//       for (var j = 0; j < currentWords[i].length; j++) {
+//         textList.add(TextSpan(
+//             text: currentWords[i][j],
+//             style: const TextStyle(color: Colors.black)));
+//       }
+//       textList.add(const TextSpan(
+//         text: ' ',
+//       ));
+//       charWidgets.add(textList);
+//       wordWidgets.add(RichText(
+//         text: TextSpan(
+//           children: charWidgets[i],
+//         ),
+//       ));
+//     }
+//   }
+
+//   void replaceChar(Color color, String key) {
+//     TextSpan newText = TextSpan(text: key, style: TextStyle(color: color));
+//     //print(charWidgets[wordCount][charInWordCount]);
+//     charWidgets[wordCount][charInWordCount] = newText;
+
+//     var newWord = RichText(
+//       text: TextSpan(
+//         children: charWidgets[wordCount],
+//       ),
+//     );
+
+//     //notifyListeners();
+
+//     // wordWidgets.removeAt(wordCount);
+//     // notifyListeners();
+//     // wordWidgets.insert(wordCount, newWord);
+
+//     wordWidgets[wordCount] = newWord;
+//     //notifyListeners();
+//     // print(wordWidgets);
+//     //print(charWidgets[wordCount][charInWordCount]);
+//     //charWidgets.insert(charInWordCount, newText);
+//     //print(start == end);
+
+//     notifyListeners();
+//   }
+
+//   String currentCharacter() {
+//     String result = '';
+//     if (currentWords[wordCount].length > charInWordCount) {
+//       result = currentWords[wordCount][charInWordCount];
+//     }
+//     return result;
+//   }
+
+//   void addChild(String char, Color color, int pos) {
+//     charWidgets[wordCount].insert(
+//         charInWordCount, TextSpan(text: char, style: TextStyle(color: color)));
+//     notifyListeners();
+//   }
+
+//   void moveToNextWord() {
+//     if (charInWordCount < currentWords[wordCount].length) {
+//       int missingChars = currentWords[wordCount].length - charInWordCount;
+//       for (int i = 0; i < missingChars; i++) {
+//         replaceChar(
+//           incorrectColor,
+//           currentWords[wordCount][charInWordCount + i],
+//         );
+//       }
+//     }
+//     charInWordCount = 0;
+//     wordCount++;
+//     print("space");
+//   }
+
+//   void correctCharTyped(String keyInput) {
+//     replaceChar(correctColor, keyInput);
+//     charInWordCount++;
+//     //print("correct");
+//   }
+
+//   void incorrectCharTyped() {
+//     replaceChar(
+//       incorrectColor,
+//       currentWords[wordCount][charInWordCount],
+//     );
+//     charInWordCount++;
+//     print('wrong');
+//   }
+
+//   void addIncorrectChar(String char) {
+//     addChild(char, incorrectColor, charInWordCount);
+//     charInWordCount++;
+//     print("overflow");
+//   }
+
+//   void deleteChar() {
+//     if (charInWordCount > 0) {
+//       if (charInWordCount <= currentWords[wordCount].length) {
+//         charInWordCount--;
+//         print("delete in limit");
+//         replaceChar(
+//           defaultColor,
+//           currentWords[wordCount][charInWordCount],
+//         );
+//       } else {
+//         var w = wordWidgets.removeAt(charInWordCount);
+//         print(w);
+//         charInWordCount--;
+//         print("delete over limit");
+//         notifyListeners();
+//       }
+//     }
+//   }
+// }
 class KeyboardState extends ChangeNotifier {
   KeyboardState() {
     loadWords().then((value) {
       wordBank = value.split("\r\n"); // \n new line, \r\n carriage return
-      //addWords(100);
     });
   }
 
+  var wordBank = <String>[];
   var wordWidgets = <Widget>[];
   var currentWords = <String>[];
-  var wordBank = <String>[];
-
   int charInWidgetsCount = 0;
   int wordCount = 0;
   int charInWordCount = 0;
@@ -260,37 +437,39 @@ class KeyboardState extends ChangeNotifier {
     return response;
   }
 
-  void addWords(int numberOfWords) {
+  void resetWords() {
     wordWidgets.clear();
     currentWords.clear();
     charInWidgetsCount = 0;
     wordCount = 0;
     charInWordCount = 0;
+  }
 
+  void addWords(int numberOfWords) {
     int startPoint = currentWords.length;
     int wordBankSize = wordBank.length;
-
     for (int i = 0; i < numberOfWords; i++) {
-      int randomWordPosition = Random().nextInt(wordBankSize);
-      currentWords.add(wordBank[randomWordPosition]);
+      int nextPosition = Random().nextInt(wordBankSize);
+      //print(wordBank[nextPosition]);
+      //print('Word added to bank: ' + wordBank[nextPosition]);
+      currentWords.add(wordBank[nextPosition]);
     }
 
     for (var i = startPoint; i < currentWords.length; i++) {
+      //print('Word added to widget: ' + currentWords[i]);
       for (var j = 0; j < currentWords[i].length; j++) {
-        wordWidgets.add(
-          Text(
-            currentWords[i][j], 
-            style: const TextStyle(color: Colors.black)
-          )
-        );
+        wordWidgets.add(Text(
+          currentWords[i][j],
+          style: const TextStyle(color: Colors.black),
+        ));
       }
-      wordWidgets.add(
-        const Text(
-          ' ',
-          style: TextStyle(color: Colors.black)
-        )
-      );
+      wordWidgets.add(const Text(
+        ' ',
+        style: TextStyle(color: Colors.black),
+      ));
     }
+    //print(currentWords[wordCount]);
+    notifyListeners();
   }
 
   void replaceChar(Color color, String key, pos) {
@@ -309,9 +488,11 @@ class KeyboardState extends ChangeNotifier {
 
   void addChild(String char, Color color, int pos) {
     wordWidgets.insert(
-      pos, 
-      Text(char, style: TextStyle(color: color))
-    );
+        pos,
+        Text(
+          char,
+          style: TextStyle(color: color),
+        ));
     notifyListeners();
   }
 
@@ -320,17 +501,20 @@ class KeyboardState extends ChangeNotifier {
       int missingChars = currentWords[wordCount].length - charInWordCount;
       for (int i = 0; i < missingChars; i++) {
         replaceChar(
-          incorrectColor, 
-          currentWords[wordCount][charInWordCount + i], 
-          charInWidgetsCount + i
-        );
+            incorrectColor,
+            currentWords[wordCount][charInWordCount + i],
+            charInWidgetsCount + i);
       }
+
       charInWidgetsCount += missingChars + 1;
+      charInWordCount = 0;
+      wordCount++;
     } else {
       charInWidgetsCount++;
+      charInWordCount = 0;
+      wordCount++;
     }
-    charInWordCount = 0;
-    wordCount++;
+
     // print("space");
   }
 
@@ -342,11 +526,8 @@ class KeyboardState extends ChangeNotifier {
   }
 
   void incorrectCharTyped() {
-    replaceChar(
-      incorrectColor, 
-      currentWords[wordCount][charInWordCount], 
-      charInWidgetsCount
-    );
+    replaceChar(incorrectColor, currentWords[wordCount][charInWordCount],
+        charInWidgetsCount);
     charInWordCount++;
     charInWidgetsCount++;
     // print('wrong');
@@ -365,14 +546,11 @@ class KeyboardState extends ChangeNotifier {
         charInWidgetsCount--;
         charInWordCount--;
         // print("delete in limit");
-        replaceChar(
-          defaultColor, 
-          currentWords[wordCount][charInWordCount], 
-          charInWidgetsCount
-        );
+        replaceChar(defaultColor, currentWords[wordCount][charInWordCount],
+            charInWidgetsCount);
       } else {
         charInWidgetsCount--;
-        wordWidgets.removeAt(charInWidgetsCount);
+        Widget w = wordWidgets.removeAt(charInWidgetsCount);
         // print(w);
         charInWordCount--;
         // print("delete over limit");
@@ -382,15 +560,15 @@ class KeyboardState extends ChangeNotifier {
   }
 }
 
-class TypingSimplePage extends StatelessWidget {
-  const TypingSimplePage({super.key});
+class TypingPracticePage extends StatelessWidget {
+  const TypingPracticePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
 
-    Wrap aRow = Wrap(children: keyboardState.wordWidgets);
-    
+    Row textWrap = Row(children: keyboardState.wordWidgets);
+
     return RawKeyboardListener(
       onKey: (event) {
         if (event is RawKeyDownEvent) {
@@ -400,7 +578,8 @@ class TypingSimplePage extends StatelessWidget {
             keyboardState.correctCharTyped(event.character.toString());
           } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
             keyboardState.deleteChar();
-          } else if (keyboardState.currentWords[keyboardState.wordCount].length <=
+          } else if (keyboardState
+                  .currentWords[keyboardState.wordCount].length <=
               keyboardState.charInWordCount) {
             keyboardState.addIncorrectChar(event.character.toString());
           } else if (event.character != keyboardState.currentCharacter()) {
@@ -414,7 +593,87 @@ class TypingSimplePage extends StatelessWidget {
         width: 500,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: aRow,
+          child: textWrap,
+        ),
+      ),
+    );
+  }
+}
+
+class MinuteToWinPage extends StatelessWidget {
+  const MinuteToWinPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var keyboardState = context.watch<KeyboardState>();
+
+    Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
+
+    return RawKeyboardListener(
+      onKey: (event) {
+        if (event is RawKeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.space) {
+            keyboardState.moveToNextWord();
+          } else if (event.character == keyboardState.currentCharacter()) {
+            keyboardState.correctCharTyped(event.character.toString());
+          } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
+            keyboardState.deleteChar();
+          } else if (keyboardState
+                  .currentWords[keyboardState.wordCount].length <=
+              keyboardState.charInWordCount) {
+            keyboardState.addIncorrectChar(event.character.toString());
+          } else if (event.character != keyboardState.currentCharacter()) {
+            keyboardState.incorrectCharTyped();
+          }
+        }
+      },
+      focusNode: FocusNode(),
+      autofocus: true,
+      child: SizedBox(
+        width: 500,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: textWrap,
+        ),
+      ),
+    );
+  }
+}
+
+class HundredWordDashPage extends StatelessWidget {
+  const HundredWordDashPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var keyboardState = context.watch<KeyboardState>();
+
+    Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
+
+    return RawKeyboardListener(
+      onKey: (event) {
+        if (event is RawKeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.space) {
+            keyboardState.moveToNextWord();
+          } else if (event.character == keyboardState.currentCharacter()) {
+            keyboardState.correctCharTyped(event.character.toString());
+          } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
+            keyboardState.deleteChar();
+          } else if (keyboardState
+                  .currentWords[keyboardState.wordCount].length <=
+              keyboardState.charInWordCount) {
+            keyboardState.addIncorrectChar(event.character.toString());
+          } else if (event.character != keyboardState.currentCharacter()) {
+            keyboardState.incorrectCharTyped();
+          }
+        }
+      },
+      focusNode: FocusNode(),
+      autofocus: true,
+      child: SizedBox(
+        width: 500,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: textWrap,
         ),
       ),
     );

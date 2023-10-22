@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 206, 46)),
           useMaterial3: true,
         ),
         home: const MyHomePage(),
@@ -422,8 +422,13 @@ class TypingPracticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
 
-    Column textWrap = Column(children: keyboardState.wordWidgets);
-
+    // ListView textWrap = ListView(
+    //   shrinkWrap: true,
+    //   physics: const NeverScrollableScrollPhysics(),
+    //   children: keyboardState.wordWidgets
+    // );
+    //ListView textWrap = ListView(children: keyboardState.wordWidgets,);
+    Column textWrap = Column(children: keyboardState.wordWidgets,);
     return RawKeyboardListener(
       onKey: (event) {
         if (event is RawKeyDownEvent) {
@@ -448,7 +453,9 @@ class TypingPracticePage extends StatelessWidget {
         width: 500,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: textWrap,
+          child: ListView(
+            children: keyboardState.wordWidgets
+          ),
         ),
       ),
     );

@@ -322,21 +322,7 @@ class KeyboardState extends ChangeNotifier {
     TextSpan newText = TextSpan(text: key, style: TextStyle(color: color));
     //print(charWidgets[wordCount][charInWordCount]);
     charWidgets[wordCount][charInWordCount] = newText;
-    double newTextScale;
-    if (wordWidgets[wordCount].textScaleFactor == 1) {
-      newTextScale = 0.999999;
-    } else {
-      newTextScale = 1;
-    }
-    var newWord = RichText(
-      textScaleFactor: newTextScale,
-      text: TextSpan(
-        children: charWidgets[wordCount],
-      ),
-    );
-
-    wordWidgets[wordCount] = newWord;
-
+    updateCurrentWord();
     notifyListeners();
   }
 
@@ -345,14 +331,8 @@ class KeyboardState extends ChangeNotifier {
     if (currentWords[wordCount].length > charInWordCount) {
       result = currentWords[wordCount][charInWordCount];
     }
-    print(result);
+    //print(result);
     return result;
-  }
-
-  void addChild(String char, Color color, int pos) {
-    charWidgets[wordCount].insert(
-        charInWordCount, TextSpan(text: char, style: TextStyle(color: color)));
-    notifyListeners();
   }
 
   void moveToNextWord() {
@@ -386,9 +366,13 @@ class KeyboardState extends ChangeNotifier {
   }
 
   void addIncorrectChar(String char) {
-    addChild(char, incorrectColor, charInWordCount);
+    TextSpan newText =
+        TextSpan(text: char, style: TextStyle(color: incorrectColor));
+    charWidgets[wordCount].insert(charInWordCount, newText);
+    updateCurrentWord();
     charInWordCount++;
     print("overflow");
+    notifyListeners();
   }
 
   void deleteChar() {
@@ -401,13 +385,33 @@ class KeyboardState extends ChangeNotifier {
           currentWords[wordCount][charInWordCount],
         );
       } else {
-        var w = wordWidgets.removeAt(charInWordCount);
+        //var w = wordWidgets.removeAt(charInWordCount);
+        var w = charWidgets[wordCount].removeAt(charInWordCount - 1);
         print(w);
         charInWordCount--;
+        updateCurrentWord();
         print("delete over limit");
         notifyListeners();
       }
     }
+  }
+
+  void updateCurrentWord() {
+    double newTextScale;
+    if (wordWidgets[wordCount].textScaleFactor == 1) {
+      newTextScale = 0.999999;
+    } else {
+      newTextScale = 1;
+    }
+
+    var newWord = RichText(
+      textScaleFactor: newTextScale,
+      text: TextSpan(
+        children: charWidgets[wordCount],
+      ),
+    );
+
+    wordWidgets[wordCount] = newWord;
   }
 }
 

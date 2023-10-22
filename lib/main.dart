@@ -261,7 +261,6 @@ class KeyboardState extends ChangeNotifier {
   KeyboardState() {
     loadWords().then((value) {
       wordBank = value.split("\r\n"); // \n new line, \r\n carriage return
-      //addWords(100);
     });
   }
 
@@ -385,7 +384,6 @@ class KeyboardState extends ChangeNotifier {
           currentWords[wordCount][charInWordCount],
         );
       } else {
-        //var w = wordWidgets.removeAt(charInWordCount);
         var w = charWidgets[wordCount].removeAt(charInWordCount - 1);
         print(w);
         charInWordCount--;
@@ -421,13 +419,6 @@ class TypingPracticePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
-
-    // ListView textWrap = ListView(
-    //   shrinkWrap: true,
-    //   physics: const NeverScrollableScrollPhysics(),
-    //   children: keyboardState.wordWidgets
-    // );
-    //ListView textWrap = ListView(children: keyboardState.wordWidgets,);
     Column textWrap = Column(children: keyboardState.wordWidgets,);
     return RawKeyboardListener(
       onKey: (event) {
@@ -472,9 +463,7 @@ class MinuteToWinPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
-
     Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
-
     return RawKeyboardListener(
       onKey: (event) {
         if (event is RawKeyDownEvent) {
@@ -512,9 +501,7 @@ class HundredWordDashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var keyboardState = context.watch<KeyboardState>();
-
     Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
-
     return RawKeyboardListener(
       onKey: (event) {
         if (event is RawKeyDownEvent) {

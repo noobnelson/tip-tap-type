@@ -213,7 +213,7 @@ class DifficultySelectPage extends StatelessWidget {
                 child: FilledButton(
                   onPressed: () {
                     keyboardState.resetWords();
-                    keyboardState.addWords(30);
+                    keyboardState.addWords(100);
                     appState.updatePlayIndex(1);
                   },
                   child: const Text('Typing Practice'),
@@ -453,9 +453,13 @@ class TypingPracticePage extends StatelessWidget {
         width: 500,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: ListView(
-            children: keyboardState.wordWidgets
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: textWrap,
           ),
+          // child: ListView(
+          //   children: keyboardState.wordWidgets
+          // ),
         ),
       ),
     );

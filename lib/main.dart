@@ -5,6 +5,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tip_tap_type/theme/theme_constants.dart';
+import 'package:tip_tap_type/theme/theme_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,21 +18,24 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    //print('myapp build');
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MyAppState()),
         ChangeNotifierProvider(create: (context) => KeyboardState()),
+        ChangeNotifierProvider(create: (context) => ThemeManager()),
       ],
-      //create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromARGB(255, 255, 206, 46)),
-          useMaterial3: true,
-        ),
-        home: const MyHomePage(),
-      ),
+      child: Builder(builder: (BuildContext context) {
+        final themeManager = Provider.of<ThemeManager>(context);
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: themeManager.themeMode,
+          home: const MyHomePage(),
+        );
+      }),
     );
   }
 }
@@ -203,13 +208,13 @@ class _PlayPageState extends State<PlayPage> {
         page = const DifficultySelectPage();
         break;
       case 1:
-        page = const TypingPracticePage();
+        page = const TypingPage();
         break;
       case 2:
-        page = const MinuteToWinPage();
+        page = const TypingPage();
         break;
       case 3:
-        page = const HundredWordDashPage();
+        page = const TypingPage();
         break;
       default:
         throw UnimplementedError('no widget');
@@ -315,7 +320,6 @@ class KeyboardState extends ChangeNotifier {
   List<String> wordBank = [];
   List<List<TextSpan>> charWidgets = [[]];
 
-  int wordCount = 0;
   int charInWordCount = 0;
 
   Color correctColor = Colors.green;
@@ -331,7 +335,6 @@ class KeyboardState extends ChangeNotifier {
     wordWidgets.clear();
     charWidgets.clear();
     currentWords.clear();
-    wordCount = 0;
     charInWordCount = 0;
   }
 
@@ -365,76 +368,80 @@ class KeyboardState extends ChangeNotifier {
 
   void replaceChar(Color color, String key) {
     TextSpan newText = TextSpan(text: key, style: TextStyle(color: color));
-    //print(charWidgets[wordCount][charInWordCount]);
-    charWidgets[wordCount][charInWordCount] = newText;
+    //print(charWidgets[0][charInWordCount]);
+    charWidgets[0][charInWordCount] = newText;
     updateCurrentWord();
     notifyListeners();
   }
 
   String currentCharacter() {
     String result = '';
-    if (currentWords[wordCount].length > charInWordCount) {
-      result = currentWords[wordCount][charInWordCount];
+    if (currentWords[0].length > charInWordCount) {
+      result = currentWords[0][charInWordCount];
     }
     //print(result);
     return result;
   }
 
   void moveToNextWord() {
-    if (charInWordCount < currentWords[wordCount].length) {
-      int missingChars = currentWords[wordCount].length - charInWordCount;
+    if (charInWordCount < currentWords[0].length) {
+      int missingChars = currentWords[0].length - charInWordCount;
       for (int i = 0; i < missingChars; i++) {
         replaceChar(
           incorrectColor,
-          currentWords[wordCount][charInWordCount + i],
+          currentWords[0][charInWordCount + i],
         );
       }
     }
+    wordWidgets.removeAt(0);
+    currentWords.removeAt(0);
+    charWidgets.removeAt(0);
+    addWords(1);
     charInWordCount = 0;
-    wordCount++;
-    print("space");
+    //print("space");
+    notifyListeners();
   }
 
   void correctCharTyped(String keyInput) {
     replaceChar(correctColor, keyInput);
     charInWordCount++;
-    print("correct");
+    //print("correct");
   }
 
   void incorrectCharTyped() {
     replaceChar(
       incorrectColor,
-      currentWords[wordCount][charInWordCount],
+      currentWords[0][charInWordCount],
     );
     charInWordCount++;
-    print('wrong');
+    //print('wrong');
   }
 
   void addIncorrectChar(String char) {
     TextSpan newText =
         TextSpan(text: char, style: TextStyle(color: incorrectColor));
-    charWidgets[wordCount].insert(charInWordCount, newText);
+    charWidgets[0].insert(charInWordCount, newText);
     updateCurrentWord();
     charInWordCount++;
-    print("overflow");
+    //print("overflow");
     notifyListeners();
   }
 
   void deleteChar() {
     if (charInWordCount > 0) {
-      if (charInWordCount <= currentWords[wordCount].length) {
+      if (charInWordCount <= currentWords[0].length) {
         charInWordCount--;
-        print("delete in limit");
+        //print("delete in limit");
         replaceChar(
           defaultColor,
-          currentWords[wordCount][charInWordCount],
+          currentWords[0][charInWordCount],
         );
       } else {
-        var w = charWidgets[wordCount].removeAt(charInWordCount - 1);
-        print(w);
+        var w = charWidgets[0].removeAt(charInWordCount - 1);
+        //print(w);
         charInWordCount--;
         updateCurrentWord();
-        print("delete over limit");
+        //print("delete over limit");
         notifyListeners();
       }
     }
@@ -442,8 +449,8 @@ class KeyboardState extends ChangeNotifier {
 
   void updateCurrentWord() {
     double newTextScale;
-    if (wordWidgets[wordCount].textScaleFactor == 1) {
-      newTextScale = 0.999999;
+    if (wordWidgets[0].textScaleFactor == 1) {
+      newTextScale = 0.99999;
     } else {
       newTextScale = 1;
     }
@@ -451,16 +458,16 @@ class KeyboardState extends ChangeNotifier {
     var newWord = RichText(
       textScaleFactor: newTextScale,
       text: TextSpan(
-        children: charWidgets[wordCount],
+        children: charWidgets[0],
       ),
     );
 
-    wordWidgets[wordCount] = newWord;
+    wordWidgets[0] = newWord;
   }
 }
 
-class TypingPracticePage extends StatelessWidget {
-  const TypingPracticePage({super.key});
+class TypingPage extends StatelessWidget {
+  const TypingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -477,8 +484,7 @@ class TypingPracticePage extends StatelessWidget {
             keyboardState.correctCharTyped(event.character.toString());
           } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
             keyboardState.deleteChar();
-          } else if (keyboardState
-                  .currentWords[keyboardState.wordCount].length <=
+          } else if (keyboardState.currentWords[0].length <=
               keyboardState.charInWordCount) {
             keyboardState.addIncorrectChar(event.character.toString());
           } else if (event.character != keyboardState.currentCharacter()) {
@@ -505,82 +511,6 @@ class TypingPracticePage extends StatelessWidget {
   }
 }
 
-class MinuteToWinPage extends StatelessWidget {
-  const MinuteToWinPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var keyboardState = context.watch<KeyboardState>();
-    Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
-    return RawKeyboardListener(
-      onKey: (event) {
-        if (event is RawKeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.space) {
-            keyboardState.moveToNextWord();
-          } else if (event.character == keyboardState.currentCharacter()) {
-            keyboardState.correctCharTyped(event.character.toString());
-          } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
-            keyboardState.deleteChar();
-          } else if (keyboardState
-                  .currentWords[keyboardState.wordCount].length <=
-              keyboardState.charInWordCount) {
-            keyboardState.addIncorrectChar(event.character.toString());
-          } else if (event.character != keyboardState.currentCharacter()) {
-            keyboardState.incorrectCharTyped();
-          }
-        }
-      },
-      focusNode: FocusNode(),
-      autofocus: true,
-      child: SizedBox(
-        width: 500,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: textWrap,
-        ),
-      ),
-    );
-  }
-}
-
-class HundredWordDashPage extends StatelessWidget {
-  const HundredWordDashPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var keyboardState = context.watch<KeyboardState>();
-    Wrap textWrap = Wrap(children: keyboardState.wordWidgets);
-    return RawKeyboardListener(
-      onKey: (event) {
-        if (event is RawKeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.space) {
-            keyboardState.moveToNextWord();
-          } else if (event.character == keyboardState.currentCharacter()) {
-            keyboardState.correctCharTyped(event.character.toString());
-          } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
-            keyboardState.deleteChar();
-          } else if (keyboardState
-                  .currentWords[keyboardState.wordCount].length <=
-              keyboardState.charInWordCount) {
-            keyboardState.addIncorrectChar(event.character.toString());
-          } else if (event.character != keyboardState.currentCharacter()) {
-            keyboardState.incorrectCharTyped();
-          }
-        }
-      },
-      focusNode: FocusNode(),
-      autofocus: true,
-      child: SizedBox(
-        width: 500,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: textWrap,
-        ),
-      ),
-    );
-  }
-}
-
 class LeaderboardPage extends StatelessWidget {
   const LeaderboardPage({super.key});
   @override
@@ -597,15 +527,30 @@ class LeaderboardPage extends StatelessWidget {
   }
 }
 
-class OptionsPage extends StatelessWidget {
+class OptionsPage extends StatefulWidget {
   const OptionsPage({super.key});
+
+  @override
+  State<OptionsPage> createState() => _OptionsPageState();
+}
+
+class _OptionsPageState extends State<OptionsPage> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    print('build');
+    var themeState = context.watch<ThemeManager>();
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('OPTIONS'),
+          // FilledButton(onPressed: () {_themeManager.toggleTheme(true);}, child: Text('hey')),
+          Switch(
+              value: themeState.themeMode == ThemeMode.dark,
+              onChanged: (newValue) {
+                themeState.toggleTheme(newValue);
+                //print(themeState.themeMode);
+              }),
           SizedBox(height: 10),
         ],
       ),

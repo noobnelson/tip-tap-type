@@ -310,7 +310,7 @@ class KeyboardState extends ChangeNotifier {
       for (var j = 0; j < currentWords[i].length; j++) {
         textList.add(TextSpan(
             text: currentWords[i][j],
-            style: const TextStyle(color: Colors.black)));
+            style: const TextStyle(color: Colors.black, fontSize: 30, decoration: TextDecoration.underline)));
       }
       textList.add(const TextSpan(
         text: ' ',
@@ -452,18 +452,22 @@ class TypingPage extends StatelessWidget {
       },
       focusNode: FocusNode(),
       autofocus: true,
-      child: SizedBox(
-        width: 500,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: textWrap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 200,),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: textWrap,
+              ),
+            ),
           ),
-          // child: ListView(
-          //   children: keyboardState.wordWidgets
-          // ),
-        ),
+          SizedBox(height: 200,),
+        ],
       ),
     );
   }

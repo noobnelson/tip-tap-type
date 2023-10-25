@@ -18,8 +18,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    //print('myapp build');
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MyAppState()),
@@ -29,7 +27,7 @@ class MyApp extends StatelessWidget {
       child: Builder(builder: (BuildContext context) {
         final themeManager = Provider.of<ThemeManager>(context);
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Tip-Tap-Type',
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: themeManager.themeMode,
@@ -86,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             SafeArea(
               child: NavigationRail(
-                extended: constraints.maxWidth >= 1000,
+                extended: constraints.maxWidth >= 800,
                 destinations: const [
                   NavigationRailDestination(
                     icon: Icon(Icons.home),
@@ -116,7 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Expanded(
               child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
                 child: page,
               ),
             ),
@@ -136,56 +133,32 @@ class TitlePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Welcome! Let's get practicing!",
-              style:
-                  DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
-            ),
-            const SizedBox(height: 30),
-            RichText(
-              text: const TextSpan(
-                style: TextStyle(color: Colors.black),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: 'MODES',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40,
-                    ),
-                  ),
-                ],
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                "TIP-TAP-TYPE",
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
-            const Text(
-              'Typing Practice',
-              style: TextStyle(fontSize: 30),
+            const SizedBox(height: 30),
+            Text('Modes', style: Theme.of(context).textTheme.headlineMedium,),
+            const ListTile(
+              title: Text('Typing Practice'),
+              subtitle: Text('Just keep typing, just keep typing~'),
             ),
-            const Text(
-              'Just keep typing, just keep typing~',
+            const SizedBox(height: 10),
+            const ListTile(
+              title: Text('100 Word Dash'),
+              subtitle: Text('Type 100 as fast as you can!'),
             ),
-            const SizedBox(
-              height: 10,
+            const SizedBox(height: 10),
+            const ListTile(
+              title: Text('Minute to Win It'),
+              subtitle: Text(
+                'Put your skills to the test! Can you type 100 words in 1 minute?'
+              ),
             ),
-            const Text(
-              '100 Word Dash',
-              style: TextStyle(fontSize: 30),
-            ),
-            const Text(
-              'Type 100 words as fast as you can!',
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Text(
-              'Minute to Win It',
-              style: TextStyle(fontSize: 30),
-            ),
-            const Text(
-              'Put your skills to the test! Can you type 100 words in 1 minute?',
-            ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
           ],
         ));
   }
@@ -240,64 +213,49 @@ class DifficultySelectPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'SELECT MODE',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+              style: Theme.of(context).textTheme.headlineLarge,
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: SizedBox(
-                height: 300,
-                width: 300,
-                child: FilledButton(
-                  onPressed: () {
-                    keyboardState.resetWords();
-                    keyboardState.addWords(100);
-                    appState.updatePlayIndex(1);
-                  },
-                  child: const Text(
-                    'Typing Practice',
-                    style: TextStyle(fontSize: 30),
-                    textAlign: TextAlign.center,
-                  ),
+              child: FilledButton(
+                onPressed: () {
+                  keyboardState.resetWords();
+                  keyboardState.addWords(100);
+                  appState.updatePlayIndex(1);
+                },
+                child: Text(
+                  'Typing Practice',
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
               ),
             ),
             const SizedBox(height: 50),
             Expanded(
-              child: SizedBox(
-                height: 300,
-                width: 300,
-                child: FilledButton(
-                  onPressed: () {
-                    keyboardState.resetWords();
-                    keyboardState.addWords(100);
-                    appState.updatePlayIndex(2);
-                  },
-                  child: const Text(
-                    'Minute to Win it',
-                    style: TextStyle(fontSize: 30),
-                    textAlign: TextAlign.center,
-                  ),
+              child: FilledButton(
+                onPressed: () {
+                  keyboardState.resetWords();
+                  keyboardState.addWords(100);
+                  appState.updatePlayIndex(2);
+                },
+                child: Text(
+                  'Minute to Win it',
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
               ),
             ),
             const SizedBox(height: 50),
             Expanded(
-              child: SizedBox(
-                height: 300,
-                width: 300,
-                child: FilledButton(
-                  onPressed: () {
-                    keyboardState.resetWords();
-                    keyboardState.addWords(100);
-                    appState.updatePlayIndex(3);
-                  },
-                  child: const Text(
-                    'Hundred Word Dash',
-                    style: TextStyle(fontSize: 30),
-                    textAlign: TextAlign.center,
-                  ),
+              child: FilledButton(
+                onPressed: () {
+                  keyboardState.resetWords();
+                  keyboardState.addWords(100);
+                  appState.updatePlayIndex(3);
+                },
+                child: Text(
+                  'Hundred Word Dash',
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
               ),
             ),
@@ -544,12 +502,10 @@ class _OptionsPageState extends State<OptionsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('OPTIONS'),
-          // FilledButton(onPressed: () {_themeManager.toggleTheme(true);}, child: Text('hey')),
           Switch(
               value: themeState.themeMode == ThemeMode.dark,
               onChanged: (newValue) {
                 themeState.toggleTheme(newValue);
-                //print(themeState.themeMode);
               }),
           SizedBox(height: 10),
         ],

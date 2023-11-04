@@ -11,8 +11,6 @@ class ThemeManager with ChangeNotifier {
     } else {
       _themeMode = ThemeMode.light;
     }
-    //print(isDark);
-    // print('theme change: $themeMode');
     notifyListeners();
   }
 }

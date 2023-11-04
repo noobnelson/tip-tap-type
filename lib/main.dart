@@ -62,16 +62,13 @@ class _MyHomePageState extends State<MyHomePage> {
     var appState = context.watch<MyAppState>();
     Widget page;
     switch (selectedIndex) {
-      case 0:
+      case 1:
         page = const TitlePage();
         break;
-      case 1:
+      case 0:
         page = const PlayPage();
         break;
       case 2:
-        page = const LeaderboardPage();
-        break;
-      case 3:
         page = const OptionsPage();
         break;
       default:
@@ -93,10 +90,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   NavigationRailDestination(
                     icon: Icon(Icons.sports_esports),
                     label: Text('Play'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.star_rounded),
-                    label: Text('Highscores'),
                   ),
                   NavigationRailDestination(
                     icon: Icon(Icons.settings),
@@ -141,7 +134,10 @@ class TitlePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-            Text('Modes', style: Theme.of(context).textTheme.headlineMedium,),
+            Text(
+              'Modes',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             const ListTile(
               title: Text('Typing Practice'),
               subtitle: Text('Just keep typing, just keep typing~'),
@@ -155,8 +151,7 @@ class TitlePage extends StatelessWidget {
             const ListTile(
               title: Text('Minute to Win It'),
               subtitle: Text(
-                'Put your skills to the test! Can you type 100 words in 1 minute?'
-              ),
+                  'Put your skills to the test! Can you type 100 words in 1 minute?'),
             ),
             const SizedBox(height: 10),
           ],
@@ -222,7 +217,7 @@ class DifficultySelectPage extends StatelessWidget {
               child: FilledButton(
                 onPressed: () {
                   keyboardState.resetWords();
-                  keyboardState.addWords(100);
+                  keyboardState.addWords(6);
                   appState.updatePlayIndex(1);
                 },
                 child: Text(
@@ -236,7 +231,7 @@ class DifficultySelectPage extends StatelessWidget {
               child: FilledButton(
                 onPressed: () {
                   keyboardState.resetWords();
-                  keyboardState.addWords(100);
+                  keyboardState.addWords(6);
                   appState.updatePlayIndex(2);
                 },
                 child: Text(
@@ -250,7 +245,7 @@ class DifficultySelectPage extends StatelessWidget {
               child: FilledButton(
                 onPressed: () {
                   keyboardState.resetWords();
-                  keyboardState.addWords(100);
+                  keyboardState.addWords(6);
                   appState.updatePlayIndex(3);
                 },
                 child: Text(
@@ -273,6 +268,11 @@ class KeyboardState extends ChangeNotifier {
     });
   }
 
+  int correctWordCount = 0;
+  int incorrectCount = 0;
+  int timer = 0;
+  String currentStringInput = '';
+
   List<RichText> wordWidgets = [];
   List<String> currentWords = [];
   List<String> wordBank = [];
@@ -280,9 +280,16 @@ class KeyboardState extends ChangeNotifier {
 
   int charInWordCount = 0;
 
-  Color correctColor = Colors.green;
-  Color incorrectColor = Colors.red;
-  Color defaultColor = Colors.black;
+  TextStyle defaultText =
+      const TextStyle(color: Color.fromARGB(74, 0, 0, 0), fontSize: 30);
+  TextStyle correctText = const TextStyle(color: Colors.black, fontSize: 30);
+  TextStyle incorrectText =
+      const TextStyle(color: Color.fromARGB(255, 203, 84, 75), fontSize: 30);
+  TextStyle currentText = const TextStyle(
+    color: Color.fromARGB(74, 0, 0, 0),
+    fontSize: 30,
+    decoration: TextDecoration.underline,
+  );
 
   Future<String> loadWords() async {
     final String response = await rootBundle.loadString('assets/words.txt');
@@ -308,9 +315,7 @@ class KeyboardState extends ChangeNotifier {
     for (var i = startPoint; i < currentWords.length; i++) {
       var textList = <TextSpan>[];
       for (var j = 0; j < currentWords[i].length; j++) {
-        textList.add(TextSpan(
-            text: currentWords[i][j],
-            style: const TextStyle(color: Colors.black, fontSize: 30, decoration: TextDecoration.underline)));
+        textList.add(TextSpan(text: currentWords[i][j], style: defaultText));
       }
       textList.add(const TextSpan(
         text: ' ',
@@ -324,8 +329,8 @@ class KeyboardState extends ChangeNotifier {
     }
   }
 
-  void replaceChar(Color color, String key) {
-    TextSpan newText = TextSpan(text: key, style: TextStyle(color: color));
+  void replaceChar(TextStyle newStyle, String key) {
+    TextSpan newText = TextSpan(text: key, style: newStyle);
     //print(charWidgets[0][charInWordCount]);
     charWidgets[0][charInWordCount] = newText;
     updateCurrentWord();
@@ -342,33 +347,43 @@ class KeyboardState extends ChangeNotifier {
   }
 
   void moveToNextWord() {
+    if (currentStringInput == currentWords[0]) {
+      correctWordCount++;
+    } else {
+      incorrectCount++;
+    }
+
     if (charInWordCount < currentWords[0].length) {
       int missingChars = currentWords[0].length - charInWordCount;
       for (int i = 0; i < missingChars; i++) {
         replaceChar(
-          incorrectColor,
+          incorrectText,
           currentWords[0][charInWordCount + i],
         );
       }
     }
+
     wordWidgets.removeAt(0);
     currentWords.removeAt(0);
     charWidgets.removeAt(0);
     addWords(1);
     charInWordCount = 0;
     //print("space");
+    currentStringInput = '';
     notifyListeners();
   }
 
   void correctCharTyped(String keyInput) {
-    replaceChar(correctColor, keyInput);
+    currentStringInput += keyInput;
+    replaceChar(correctText, keyInput);
     charInWordCount++;
     //print("correct");
   }
 
-  void incorrectCharTyped() {
+  void incorrectCharTyped(String char) {
+    currentStringInput += char;
     replaceChar(
-      incorrectColor,
+      incorrectText,
       currentWords[0][charInWordCount],
     );
     charInWordCount++;
@@ -376,8 +391,8 @@ class KeyboardState extends ChangeNotifier {
   }
 
   void addIncorrectChar(String char) {
-    TextSpan newText =
-        TextSpan(text: char, style: TextStyle(color: incorrectColor));
+    currentStringInput += char;
+    TextSpan newText = TextSpan(text: char, style: incorrectText);
     charWidgets[0].insert(charInWordCount, newText);
     updateCurrentWord();
     charInWordCount++;
@@ -387,11 +402,13 @@ class KeyboardState extends ChangeNotifier {
 
   void deleteChar() {
     if (charInWordCount > 0) {
+      currentStringInput = currentStringInput.substring(0, charInWordCount - 1);
       if (charInWordCount <= currentWords[0].length) {
+
         charInWordCount--;
         //print("delete in limit");
         replaceChar(
-          defaultColor,
+          defaultText,
           currentWords[0][charInWordCount],
         );
       } else {
@@ -433,6 +450,10 @@ class TypingPage extends StatelessWidget {
     Column textWrap = Column(
       children: keyboardState.wordWidgets,
     );
+    Text correctWordCount = Text(keyboardState.correctWordCount.toString());
+    Text incorrectWordCount = Text(keyboardState.incorrectCount.toString());
+    Text timer = Text(keyboardState.timer.toString());
+
     return RawKeyboardListener(
       onKey: (event) {
         if (event is RawKeyDownEvent) {
@@ -446,7 +467,7 @@ class TypingPage extends StatelessWidget {
               keyboardState.charInWordCount) {
             keyboardState.addIncorrectChar(event.character.toString());
           } else if (event.character != keyboardState.currentCharacter()) {
-            keyboardState.incorrectCharTyped();
+            keyboardState.incorrectCharTyped(event.character.toString());
           }
         }
       },
@@ -456,33 +477,39 @@ class TypingPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 200,),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                child: textWrap,
-              ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.check),
+                        correctWordCount,
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.close),
+                        incorrectWordCount,
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.timer),
+                        timer,
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                textWrap,
+              ],
             ),
           ),
-          SizedBox(height: 200,),
-        ],
-      ),
-    );
-  }
-}
-
-class LeaderboardPage extends StatelessWidget {
-  const LeaderboardPage({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('LEADERBOARD'),
-          SizedBox(height: 10),
         ],
       ),
     );

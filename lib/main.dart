@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -148,12 +149,6 @@ class TitlePage extends StatelessWidget {
               subtitle: Text('Type 100 as fast as you can!'),
             ),
             const SizedBox(height: 10),
-            const ListTile(
-              title: Text('Minute to Win It'),
-              subtitle: Text(
-                  'Put your skills to the test! Can you type 100 words in 1 minute?'),
-            ),
-            const SizedBox(height: 10),
           ],
         ));
   }
@@ -179,9 +174,6 @@ class _PlayPageState extends State<PlayPage> {
         page = const TypingPage();
         break;
       case 2:
-        page = const TypingPage();
-        break;
-      case 3:
         page = const TypingPage();
         break;
       default:
@@ -215,6 +207,12 @@ class DifficultySelectPage extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
               child: FilledButton(
+                // onPressed: () => showDialog(
+                //   context: context, 
+                //   builder: (BuildContext context) => AlertDialog(
+                //     title: Text('3'),
+                //   ),
+                // ),
                 onPressed: () {
                   keyboardState.resetWords();
                   keyboardState.addWords(6);
@@ -233,20 +231,7 @@ class DifficultySelectPage extends StatelessWidget {
                   keyboardState.resetWords();
                   keyboardState.addWords(6);
                   appState.updatePlayIndex(2);
-                },
-                child: Text(
-                  'Minute to Win it',
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              ),
-            ),
-            const SizedBox(height: 50),
-            Expanded(
-              child: FilledButton(
-                onPressed: () {
-                  keyboardState.resetWords();
-                  keyboardState.addWords(6);
-                  appState.updatePlayIndex(3);
+                  keyboardState.startTimer();
                 },
                 child: Text(
                   'Hundred Word Dash',
@@ -267,10 +252,12 @@ class KeyboardState extends ChangeNotifier {
       wordBank = value.split("\r\n"); // \n new line, \r\n carriage return
     });
   }
-
+  Stopwatch stopwatch = Stopwatch();
+  late Timer timer;
+  int timeCount = 0;
   int correctWordCount = 0;
   int incorrectCount = 0;
-  int timer = 0;
+  
   String currentStringInput = '';
 
   List<RichText> wordWidgets = [];
@@ -294,6 +281,20 @@ class KeyboardState extends ChangeNotifier {
   Future<String> loadWords() async {
     final String response = await rootBundle.loadString('assets/words.txt');
     return response;
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(const Duration(microseconds: 30), (Timer t) { 
+      timeCount = stopwatch.elapsed.inSeconds;
+      notifyListeners();
+      if (correctWordCount == 100) {
+        stopwatch.stop();
+        timer.cancel();
+        print('object');
+      }
+      }
+    );
+    stopwatch.start();
   }
 
   void resetWords() {
@@ -452,7 +453,7 @@ class TypingPage extends StatelessWidget {
     );
     Text correctWordCount = Text(keyboardState.correctWordCount.toString());
     Text incorrectWordCount = Text(keyboardState.incorrectCount.toString());
-    Text timer = Text(keyboardState.timer.toString());
+    Text timer = Text(keyboardState.timeCount.toString());
 
     return RawKeyboardListener(
       onKey: (event) {

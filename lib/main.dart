@@ -279,7 +279,7 @@ class WordsState extends ChangeNotifier {
   void startTimer() {
     timer = Timer.periodic(const Duration(microseconds: 30), (Timer t) { 
       timeCount = stopwatch.elapsed.inSeconds;
-      if (correctWordCount == 10 && !objectiveComplete && stopwatch.isRunning) {
+      if (correctWordCount == 100 && !objectiveComplete && stopwatch.isRunning) {
         stopwatch.stop();
         stopwatch.reset();
         timer.cancel();
@@ -533,7 +533,6 @@ class OptionsPage extends StatefulWidget {
 class _OptionsPageState extends State<OptionsPage> {
   @override
   Widget build(BuildContext context) {
-    print('build');
     var themeState = context.watch<ThemeManager>();
     return Center(
       child: Column(

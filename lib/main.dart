@@ -16,13 +16,12 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MyAppState()),
-        ChangeNotifierProvider(create: (context) => KeyboardState()),
+        ChangeNotifierProvider(create: (context) => WordsState()),
         ChangeNotifierProvider(create: (context) => ThemeManager()),
       ],
       child: Builder(builder: (BuildContext context) {
@@ -63,10 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var appState = context.watch<MyAppState>();
     Widget page;
     switch (selectedIndex) {
-      case 1:
+      case 0:
         page = const TitlePage();
         break;
-      case 0:
+      case 1:
         page = const PlayPage();
         break;
       case 2:
@@ -173,9 +172,6 @@ class _PlayPageState extends State<PlayPage> {
       case 1:
         page = const TypingPage();
         break;
-      case 2:
-        page = const TypingPage();
-        break;
       default:
         throw UnimplementedError('no widget');
     }
@@ -192,7 +188,7 @@ class DifficultySelectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var keyboardState = context.watch<KeyboardState>();
+    var wordsState = context.watch<WordsState>();
 
     return Center(
       child: Padding(
@@ -207,15 +203,9 @@ class DifficultySelectPage extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
               child: FilledButton(
-                // onPressed: () => showDialog(
-                //   context: context, 
-                //   builder: (BuildContext context) => AlertDialog(
-                //     title: Text('3'),
-                //   ),
-                // ),
                 onPressed: () {
-                  keyboardState.resetWords();
-                  keyboardState.addWords(6);
+                  wordsState.resetAllValues();
+                  wordsState.addWords(6);
                   appState.updatePlayIndex(1);
                 },
                 child: Text(
@@ -228,10 +218,10 @@ class DifficultySelectPage extends StatelessWidget {
             Expanded(
               child: FilledButton(
                 onPressed: () {
-                  keyboardState.resetWords();
-                  keyboardState.addWords(6);
-                  appState.updatePlayIndex(2);
-                  keyboardState.startTimer();
+                  wordsState.resetAllValues();
+                  wordsState.addWords(6);
+                  appState.updatePlayIndex(1);
+                  wordsState.startTimer();
                 },
                 child: Text(
                   'Hundred Word Dash',
@@ -246,30 +236,33 @@ class DifficultySelectPage extends StatelessWidget {
   }
 }
 
-class KeyboardState extends ChangeNotifier {
-  KeyboardState() {
+class WordsState extends ChangeNotifier {
+  WordsState() {
     loadWords().then((value) {
       wordBank = value.split("\r\n"); // \n new line, \r\n carriage return
     });
   }
+  bool objectiveComplete = false;
+
   Stopwatch stopwatch = Stopwatch();
   late Timer timer;
   int timeCount = 0;
+
   int correctWordCount = 0;
-  int incorrectCount = 0;
-  
+  int incorrectWordCount = 0;
+  int charInWordCount = 0;
+
   String currentStringInput = '';
+  String objectiveCompleteString = '';
 
   List<RichText> wordWidgets = [];
   List<String> currentWords = [];
   List<String> wordBank = [];
   List<List<TextSpan>> charWidgets = [[]];
 
-  int charInWordCount = 0;
-
   TextStyle defaultText =
-      const TextStyle(color: Color.fromARGB(74, 0, 0, 0), fontSize: 30);
-  TextStyle correctText = const TextStyle(color: Colors.black, fontSize: 30);
+      const TextStyle(color: Color.fromARGB(71, 255, 255, 255), fontSize: 30);
+  TextStyle correctText = const TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 30);
   TextStyle incorrectText =
       const TextStyle(color: Color.fromARGB(255, 203, 84, 75), fontSize: 30);
   TextStyle currentText = const TextStyle(
@@ -286,22 +279,30 @@ class KeyboardState extends ChangeNotifier {
   void startTimer() {
     timer = Timer.periodic(const Duration(microseconds: 30), (Timer t) { 
       timeCount = stopwatch.elapsed.inSeconds;
-      notifyListeners();
-      if (correctWordCount == 100) {
+      if (correctWordCount == 10 && !objectiveComplete && stopwatch.isRunning) {
         stopwatch.stop();
+        stopwatch.reset();
         timer.cancel();
-        print('object');
+        objectiveComplete = true;
+        objectiveCompleteString = "You typed 100 words in $timeCount seconds!";
       }
-      }
-    );
+      notifyListeners();
+    });
     stopwatch.start();
   }
 
-  void resetWords() {
+  void resetAllValues() {
     wordWidgets.clear();
     charWidgets.clear();
     currentWords.clear();
+    stopwatch.reset();
+    stopwatch.stop();
     charInWordCount = 0;
+    timeCount = 0;
+    correctWordCount = 0;
+    incorrectWordCount = 0;
+    objectiveComplete = false;
+    objectiveCompleteString = '';
   }
 
   void addWords(int numberOfWords) {
@@ -351,7 +352,7 @@ class KeyboardState extends ChangeNotifier {
     if (currentStringInput == currentWords[0]) {
       correctWordCount++;
     } else {
-      incorrectCount++;
+      incorrectWordCount++;
     }
 
     if (charInWordCount < currentWords[0].length) {
@@ -381,8 +382,8 @@ class KeyboardState extends ChangeNotifier {
     //print("correct");
   }
 
-  void incorrectCharTyped(String char) {
-    currentStringInput += char;
+  void incorrectCharTyped(String keyInput) {
+    currentStringInput += keyInput;
     replaceChar(
       incorrectText,
       currentWords[0][charInWordCount],
@@ -447,28 +448,33 @@ class TypingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var keyboardState = context.watch<KeyboardState>();
-    Column textWrap = Column(
-      children: keyboardState.wordWidgets,
-    );
-    Text correctWordCount = Text(keyboardState.correctWordCount.toString());
-    Text incorrectWordCount = Text(keyboardState.incorrectCount.toString());
-    Text timer = Text(keyboardState.timeCount.toString());
+    var wordsState = context.watch<WordsState>();
+    Column textWrap = Column(children: wordsState.wordWidgets);
+    Text correctCount = Text(wordsState.correctWordCount.toString());
+    Text incorrectCount = Text(wordsState.incorrectWordCount.toString());
+    Text timer = Text(wordsState.timeCount.toString());
+    Text objectiveCompleteText = Text(wordsState.objectiveCompleteString);
 
     return RawKeyboardListener(
       onKey: (event) {
-        if (event is RawKeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.space) {
-            keyboardState.moveToNextWord();
-          } else if (event.character == keyboardState.currentCharacter()) {
-            keyboardState.correctCharTyped(event.character.toString());
+        if (event is RawKeyDownEvent && !wordsState.objectiveComplete) {
+          // finished typing word
+          if (event.logicalKey == LogicalKeyboardKey.space
+            || event.logicalKey == LogicalKeyboardKey.enter) {
+            wordsState.moveToNextWord();
+          // correct key input
+          } else if (event.character == wordsState.currentCharacter()) {
+            wordsState.correctCharTyped(event.character.toString());
+          // delete char
           } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
-            keyboardState.deleteChar();
-          } else if (keyboardState.currentWords[0].length <=
-              keyboardState.charInWordCount) {
-            keyboardState.addIncorrectChar(event.character.toString());
-          } else if (event.character != keyboardState.currentCharacter()) {
-            keyboardState.incorrectCharTyped(event.character.toString());
+            wordsState.deleteChar();
+          // typed more than expected
+          } else if (wordsState.currentWords[0].length <=
+              wordsState.charInWordCount) {
+            wordsState.addIncorrectChar(event.character.toString());
+          // wrong key input
+          } else if (event.character != wordsState.currentCharacter()) {
+            wordsState.incorrectCharTyped(event.character.toString());
           }
         }
       },
@@ -486,28 +492,28 @@ class TypingPage extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.check),
-                        correctWordCount,
+                        const Icon(Icons.check),
+                        correctCount,
                       ],
                     ),
                     Row(
                       children: [
-                        Icon(Icons.close),
-                        incorrectWordCount,
+                        const Icon(Icons.close),
+                        incorrectCount,
                       ],
                     ),
                     Row(
                       children: [
-                        Icon(Icons.timer),
+                        const Icon(Icons.timer),
                         timer,
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 50,
-                ),
+                const SizedBox(height: 50),
                 textWrap,
+                const SizedBox(height: 50),
+                objectiveCompleteText,
               ],
             ),
           ),
@@ -531,15 +537,19 @@ class _OptionsPageState extends State<OptionsPage> {
     var themeState = context.watch<ThemeManager>();
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text('OPTIONS'),
+          Text(
+            'OPTIONS',
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          const Text('Dark Mode'),
           Switch(
               value: themeState.themeMode == ThemeMode.dark,
               onChanged: (newValue) {
                 themeState.toggleTheme(newValue);
               }),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
         ],
       ),
     );
